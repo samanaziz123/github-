@@ -1,0 +1,128 @@
+/* GENERATED WITH: npm run dist */
+(function () {
+  'use strict';
+
+  // Show downloader on marketing page for user's OS
+  var os = "";
+
+  if (navigator.userAgent.indexOf("Win") != -1) {
+    os = "windows";
+  }
+
+  if (navigator.userAgent.indexOf("Mac") != -1) {
+    os = "mac";
+  }
+
+  if (navigator.userAgent.indexOf("Linux") != -1) {
+    os = "linux";
+  }
+
+  Array.from(document.querySelectorAll(".download-" + os)).forEach(function (el) {
+    el.classList.remove("d-none");
+  });
+
+  window.GitHub = {};
+
+  var keystrokeDelay = 60; // ms between keystrokes
+  var outputDelay = 300; // ms before command output is shown
+  var cycleDelay = 5000; // ms between going to next command
+  var cycleTimeout = null; // timeout
+  var commandIndex = 1; // start at first command
+
+  var numCommands = document.querySelectorAll(".command-header .command").length;
+  var playButton = document.getElementById("play-btn");
+  var pauseButton = document.getElementById("pause-btn");
+
+  const prefersReducedMotion = window.matchMedia(`(prefers-reduced-motion: reduce)`) === true ||
+    window.matchMedia(`(prefers-reduced-motion: reduce)`).matches === true;
+
+  function showCommand(cycle = true) {
+    if (commandIndex > numCommands) { commandIndex = 1; }
+
+    // clear all timeouts
+    clearTimeout(cycleTimeout);
+
+    // hide previous commands
+    Array.from(document.querySelectorAll(".command")).forEach(function (el) {
+      el.classList.add("d-none");
+    });
+
+    // remove hidden attribute from terminal
+    Array.from(
+      document.querySelectorAll(".cli-window .command-panel")
+    ).forEach(function (el) {
+      el.removeAttribute("hidden");
+    });
+
+    // show current command while respecting animated ones
+    Array.from(document.querySelectorAll(".command-" + commandIndex)).forEach(
+      function (el) {
+        if (el.classList.contains("type-animate-done")) { return; }
+        if (el.classList.contains("type-animate")) {
+          typeAnimate(el, function () {
+            var doneEl = el.nextElementSibling;
+            if (doneEl && doneEl.classList.contains("type-animate-done")) {
+              setTimeout(function () {
+                doneEl.classList.remove("d-none");
+              }, outputDelay);
+            }
+          });
+        }
+        el.classList.remove("d-none");
+      }
+    );
+
+    commandIndex += 1;
+
+    if (cycle) {
+      cycleTimeout = setTimeout(function () {
+        showCommand();
+      }, cycleDelay);
+    }
+  }
+
+  function typeAnimate(el, callback) {
+    var chars = el.textContent.split("");
+    el.textContent = "";
+
+    var typeIndex = 1;
+    var interval = setInterval(function () {
+      typeIndex += 1;
+      el.textContent = chars.slice(0, typeIndex).join("");
+      if (typeIndex > chars.length) {
+        clearInterval(interval);
+        interval = null;
+        callback();
+      }
+    }, keystrokeDelay);
+  }
+
+  function pauseAnimation(el, callback) {
+    clearTimeout(cycleTimeout);
+    pauseButton.setAttribute("hidden", "true");
+    playButton.removeAttribute("hidden");
+  }
+
+  function playAnimation(el, callback) {
+    showCommand();
+    playButton.setAttribute("hidden", "true");
+    pauseButton.removeAttribute("hidden");
+  }
+
+  playButton.addEventListener("click", playAnimation);
+
+  pauseButton.addEventListener("click", pauseAnimation);
+
+  if (prefersReducedMotion) {
+    pauseAnimation();
+    commandIndex = 2;
+    Array.from(document.querySelectorAll(".command-1")).forEach(
+      function (el) {
+        el.classList.remove("d-none");
+      }
+    );
+  } else {
+    playAnimation();
+  }
+
+})();

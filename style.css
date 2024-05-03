@@ -1,0 +1,42 @@
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+
+
+body{
+    background:#0D1117;
+     overflow-x: hidden;
+ }
+ .button2:hover {
+     box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+   }
+ 
+ .bg-container{
+     background: #131A2D;
+ }
+ .bg-features{
+     background: #FFFFFF;
+ }
+
+ .color-bg{
+    background-color: #e6edf3;
+
+
+ } 
+
+ .para{
+    text-align: center;
+ }
+.image-01{
+
+    background-image: url(./assets/commitrecord.png);
+ }
+
+ .main-img{
+    width: 120px;;
+ }
